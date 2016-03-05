@@ -49,12 +49,15 @@ public class ChooseAreaActivity extends Activity {
     private City selectedCity;//选中的城市
     private int currentLevel ;//当前选中的级别
 
+    private boolean isFromWeatherActivity;//从WeatherActivity中跳转过来?
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity",false);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getBoolean("city_selected", false)) {
+        if (prefs.getBoolean("city_selected", false) && !isFromWeatherActivity) {
             Intent intent = new Intent(this, WeatherMainActivity.class);
             startActivity(intent);
             finish();
@@ -72,9 +75,7 @@ public class ChooseAreaActivity extends Activity {
 
         adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,dataList);
 
-        coolWeatherDB.deleteTable("Province");
         currentLevel = LEVEL_PROVINCE;
-
 
         listView.setAdapter(adapter);
 
@@ -245,6 +246,10 @@ public class ChooseAreaActivity extends Activity {
         } else if (currentLevel == LEVEL_CITY) {
             queryProvinces();
         } else {
+            if (isFromWeatherActivity) {
+                Intent intent = new Intent(this, WeatherMainActivity.class);
+                startActivity(intent);
+            }
             finish();
         }
     }
